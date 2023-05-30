@@ -4,7 +4,12 @@
  */
 package proyectomundial.DAO;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import proyectomundial.model.Seleccion;
@@ -20,6 +25,23 @@ public class SeleccionDAO {
     public SeleccionDAO() {
         BasedeDatos.conectar();
     }
+    
+public boolean sesion(String usuario, String contraseña) {
+        String dbUrl = "jdbc:postgresql://dpg-cfpuu1qrrk0fd9ounopg-a.oregon-postgres.render.com:5432/unisimon";
+        String dbUsername = "unisimon_user";
+        String dbPassword = "11k1WiZg5ekiFQYHx9Bog6W7cTArSZea";
+
+        try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+             Statement statement = connection.createStatement()) {
+            String query = "SELECT * FROM j_monsalve3.users WHERE username = '" + usuario+ "' AND password = '" + contraseña+ "'";
+            ResultSet resultSet = statement.executeQuery(query);
+            return resultSet.next(); // Si hay una fila de resultado, las credenciales son válidas
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Si ocurre algún error, se considera que las credenciales no son válidas
+    }
+
     
     public boolean registrarSeleccion(Seleccion seleccion) {
         
