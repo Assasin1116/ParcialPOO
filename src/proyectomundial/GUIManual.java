@@ -2,6 +2,7 @@ package proyectomundial;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -17,18 +18,24 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 import proyectomundial.DAO.SeleccionDAO;
+import proyectomundial.DAO.Sesion;
 import proyectomundial.model.Seleccion;
+import proyectomundial.util.BasedeDatos;
 
 public class GUIManual extends JFrame {
 
     SeleccionDAO seleccionDAO = new SeleccionDAO();
     
+     private JTextField usernameField;
+    private JPasswordField passwordField;
+    private JButton loginButton;
     
     // Matrix que permite almancenar la información de las selecciones futbol cargadas
     public String[][] selecciones = null;
@@ -60,6 +67,9 @@ public class GUIManual extends JFrame {
     private JPanel jPanelMenuDashboardRes;
     private JLabel btnDashboardRes;
         
+    private JPanel JPanelSesion;
+     private JLabel btnSesion;
+    
     // Elementos de panel de contenido
     private JPanel jPanelRight;
     private JPanel jPanelLabelTop;
@@ -112,6 +122,11 @@ public class GUIManual extends JFrame {
         jPanelMenuDashboardRes = new JPanel();
         btnDashboardRes = new JLabel();
         
+        JPanelSesion =  new JPanel();
+        btnSesion = new JLabel();
+        
+        JPanelSesion = new JPanel();
+        
         // Pinta el logo de la aplicación
         pintarLogo();
         
@@ -129,6 +144,9 @@ public class GUIManual extends JFrame {
         
         // Pinta la opción de Menú del dahboard de resultados
         pintarMenuDashboardRes();
+        
+        // pintar sesion
+        pintarSesion();
         
         // Pinta y ajuste diseño del contenedor del panel izquierdo
         pintarPanelIzquierdo();
@@ -470,7 +488,85 @@ public class GUIManual extends JFrame {
         jPanelMain.repaint();
         jPanelMain.revalidate();        
     }
+    private void pintarSesion() {
+        btnSesion.setIcon(new ImageIcon(getClass().getResource("/resources/icons/home.png"))); // NOI18N
+        btnSesion.setText("Iniciar Sesion");
+        btnSesion.setForeground(new java.awt.Color(255, 255, 255));
+        
+        JLabel vacioSesion = new JLabel();
+        JPanelSesion.setBackground(new java.awt.Color(17, 41, 63));
+        JPanelSesion.setPreferredSize((new java.awt.Dimension(220, 35)));
+        JPanelSesion.setLayout(new BorderLayout(15, 0));
+        JPanelSesion.add(vacioSesion, BorderLayout.WEST);
+        JPanelSesion.add(btnSesion, BorderLayout.CENTER);
+        jPanelMenu.add(JPanelSesion);
+        
+        btnSesion.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                System.out.println("Iniciar Sesion");
+                accionSesion();
+            }
+        });   
+    }
     
+    /**
+     * Función que se ejecuta cuando el usuario hacer click sobre la opción de navegación Home
+     * Permite modificar la etiqueta de Navegación en Home, remover los elementos que hay en 
+     * el panel de contenidos y agregar la imagen de inicio de la aplicación
+     */
+    private void accionSesion() {
+        
+        jLabelTop.setText("Iniciar Sesion");
+        //jLabelTopDescription.setText("Bievenido al sistema de gestión de mundiales de fútbol");
+
+        jPanelMain.removeAll();
+        JPanel homePanel = new JPanel();
+        JLabel imageHome = new JLabel();
+
+        imageHome.setIcon(new ImageIcon(getClass().getResource("/resources/home.jpg"))); // NOI18N
+        //imageHome.setPreferredSize(new java.awt.Dimension(810, 465));
+        // Configuración de la ventana
+        setTitle("Login");
+
+        // Creación de los componentes
+        
+        usernameField = new JTextField(20);
+        usernameField.setPreferredSize(new Dimension(100, 30));
+        passwordField = new JPasswordField(20);
+        passwordField.setPreferredSize(new Dimension(100, 30));
+        loginButton = new JButton("Iniciar sesión");
+        loginButton.setPreferredSize(new Dimension(150, 30));
+        
+        // Configuración del diseño
+        jPanelMain.add(new JLabel("Usuario:"));
+        jPanelMain.add(usernameField);
+        jPanelMain.add(new JLabel("Contraseña:"));
+        jPanelMain.add(passwordField);
+        jPanelMain.add(loginButton);
+
+           
+        // Agregar ActionListener al botón
+       loginButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                String usuario;
+                String contraseña;
+                usuario = usernameField.getText();
+                contraseña = passwordField.getText();
+                haySesion = seleccionDAO.sesion(usuario, contraseña);
+                if (haySesion==true) {
+                    JOptionPane.showMessageDialog(null, "has iniciado sesion", "continua", JOptionPane.INFORMATION_MESSAGE);
+                }
+                if (haySesion==false) {
+                     JOptionPane.showMessageDialog(null, " los datos no son correctos", "continua", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        });   
+    
+
+        jPanelMain.add(homePanel, BorderLayout.CENTER);
+        jPanelMain.repaint();
+        jPanelMain.revalidate();
+    }
     /**
      * Función que permite darle estilos y agregar los componentes gráficos del contendor de la parte 
      * izquierda de la interfaz, dónde se visulaiza el menú de navegaación
